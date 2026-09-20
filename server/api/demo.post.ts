@@ -1,0 +1,9 @@
+import {demoProducts,ambiguousEnquiry,completeEnquiry} from '../../shared/utils/demo'
+export default defineEventHandler(async event=>{
+ const db=await authenticatedDb(event),{data:w,error}=await db.from('quolyn_workspaces').select('id').limit(1).single();if(error||!w)throw createError({statusCode:400,message:'Create a workspace first'})
+ const products=await db.from('quolyn_products').upsert(demoProducts().map(p=>({...p,workspace_id:w.id})),{onConflict:'workspace_id,sku',ignoreDuplicates:true});if(products.error)throw createError({statusCode:400,message:products.error.message})
+ let {data:c}=await db.from('quolyn_customers').select('id').eq('workspace_id',w.id).eq('name','Oakline Interiors (fictional)').maybeSingle()
+ if(!c){const r=await db.from('quolyn_customers').upsert({demo_key:'oakline',workspace_id:w.id,name:'Oakline Interiors (fictional)',contact_name:'Demo contact',address:'12 Sample Lane, Demo City (fictional)',currency:'INR',discount_bps:500,payment_terms:'Payment within 30 days (fictional)'},{onConflict:'workspace_id,demo_key'}).select('id').single();if(r.error)throw createError({statusCode:400,message:r.error.message});c=r.data}
+ for(const [title,original_text]of [['Retail flooring · ambiguous example (fictional)',ambiguousEnquiry],['100 m² porcelain · complete example (fictional)',completeEnquiry]]){const {data:exists}=await db.from('quolyn_enquiries').select('id').eq('workspace_id',w.id).eq('title',title!).maybeSingle();if(!exists){const r=await db.from('quolyn_enquiries').upsert({workspace_id:w.id,demo_key:title,customer_id:c!.id,title,original_text,source:'email',notes:'Fictional pilot example. Not a real customer.'},{onConflict:'workspace_id,demo_key',ignoreDuplicates:true});if(r.error)throw createError({statusCode:400,message:r.error.message})}}
+ return{ok:true}
+})

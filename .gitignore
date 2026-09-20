@@ -1,0 +1,14 @@
+node_modules
+.nuxt
+.output
+.env
+.env.*
+!.env.example
+supabase/.temp
+supabase/.branches
+playwright-report
+test-results
+artifacts
+.DS_Store
+
+test-results-*

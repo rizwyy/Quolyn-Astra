@@ -1,0 +1,20 @@
+drop index public.quolyn_products_workspace_id_idx;
+create index on public.quolyn_activity_logs(actor_id);
+create index on public.quolyn_enquiries(workspace_id,customer_id);
+create index on public.quolyn_enquiry_lines(workspace_id,enquiry_id);
+create index on public.quolyn_enquiry_lines(workspace_id,product_id);
+create index on public.quolyn_match_candidates(workspace_id,line_id);
+create index on public.quolyn_match_candidates(workspace_id,product_id);
+create index on public.quolyn_quote_documents(workspace_id,quote_id);
+create index on public.quolyn_quote_lines(workspace_id,quote_id);
+create index on public.quolyn_quote_lines(workspace_id,product_id);
+create index on public.quolyn_quote_lines(workspace_id,enquiry_line_id);
+create index on public.quolyn_quotes(workspace_id,customer_id);
+create index on public.quolyn_quotes(workspace_id,enquiry_id);
+create index on public.quolyn_quotes(workspace_id,parent_id);
+create index on public.quolyn_activity_logs(workspace_id,entity_id,created_at desc);
+alter table public.quolyn_quote_lines add constraint description_size check(length(description)<=2000);
+alter table public.quolyn_quotes add constraint notes_size check(length(notes)<=10000 and length(terms)<=20000);
+-- Deny-by-default tables are intentionally available only through controlled functions.
+create policy internal_only on public.quolyn_quote_counters for all to authenticated using(false) with check(false);
+create policy internal_only on quolyn_private.analysis_limits for all to authenticated using(false) with check(false);
