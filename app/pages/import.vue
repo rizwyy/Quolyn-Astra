@@ -21,9 +21,9 @@ async function commit(){await run(async()=>{
  progress.value=prior?.summary?.processed||0
  for(let i=progress.value;i<valid.value.length;i+=50){
  const batch=valid.value.slice(i,i+50),skus=batch.map(r=>r.product.sku).filter((x):x is string=>!!x)
- const existing=skus.length?check(await db.from('quolyn_products').select('id,sku').eq('workspace_id',w.value!.id).in('sku',skus)):[]
+ const existing=skus.length?check(await db.from('quolyn_products').select('id,sku,source').eq('workspace_id',w.value!.id).in('sku',skus)):[]
  const rows:any[]=[],aliasRows:any[]=[]
- for(const row of batch){const found=existing.find(p=>p.sku===row.product.sku);if(found&&duplicate.value==='skip'){skipped++;continue}const id=found?.id||await stableId(importId.value+':'+row.row);rows.push({...row.product,id,workspace_id:w.value!.id,source:'import:'+importId.value});row.aliases.forEach(alias=>aliasRows.push({workspace_id:w.value!.id,product_id:id,alias}))}
+ for(const row of batch){const found=existing.find(p=>p.sku===row.product.sku);if(found&&duplicate.value==='skip'&&found.source!=='import:'+importId.value){skipped++;continue}const id=found?.id||await stableId(importId.value+':'+row.row);rows.push({...row.product,id,workspace_id:w.value!.id,source:'import:'+importId.value});row.aliases.forEach(alias=>aliasRows.push({workspace_id:w.value!.id,product_id:id,alias}))}
  if(rows.length)check(await db.from('quolyn_products').upsert(rows,{onConflict:'id'}))
  if(aliasRows.length)check(await db.from('quolyn_product_aliases').upsert(aliasRows,{onConflict:'workspace_id,product_id,alias',ignoreDuplicates:true}))
  progress.value=Math.min(i+50,valid.value.length)

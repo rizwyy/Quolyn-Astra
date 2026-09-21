@@ -74,6 +74,6 @@ Playwright uses installed Google Chrome (`channel: 'chrome'`). Install Chrome or
 
 ## Intentional pilot boundaries
 
-No email/WhatsApp connector, payment billing, OCR, ERP sync, customer portal, purchasing, inventory reservations, vector search or team invitations. Matching is heuristic. Supported conversions are same-unit and m²/ft²; custom conversions and different cost-unit margin conversions are not implemented. Large-catalogue performance needs measurement against a real dataset. Operational monitoring, retention/deletion and production deployment are follow-up work.
+No email/WhatsApp connector, payment billing, OCR, ERP sync, customer portal, purchasing, inventory reservations, vector search or team invitations. Matching is heuristic. Conversions cover each, boxes, m²/ft², linear metres and owner-configured compatible units. Different cost-unit margin conversions are not implemented; the margin stays unavailable. A 10,000-product local fixture passed the capacity and paginated-search checks; real hosted catalogue latency still needs measurement. Operational monitoring, retention/deletion and production deployment are follow-up work.
 
 The next commercial step is one distributor and five real enquiries. Test whether catalogue quality and review effort support a paid assisted pilot before adding scope.

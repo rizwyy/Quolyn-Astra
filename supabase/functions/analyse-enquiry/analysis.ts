@@ -8,14 +8,19 @@ export function deterministicAnalysis(text: string) {
     if (/delivery|next month|next week|substitut|another option/i.test(part)) { notes.push(part); if (!/quote|flooring|tiles|\d.*(?:m²|m2|sq ft|boxes)/i.test(part)) continue }
     const chunks = part.split(/\s+and\s+(?=(?:matching\s+)?(?:edge trims|trims|underlay))/i)
     for (const raw of chunks) {
-      const m = raw.match(/(\d[\d,]*(?:\.\d+)?)\s*(sq\s*ft|ft2|m²|m2|sqm|boxes|box|each|lm)\b/i)
+      const m = raw.match(/(?<![\d,.-])((?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?)\s*(sq\s*ft|ft2|m²|m2|sqm|boxes|box|each|lm)(?=\s|[.,;:]|$)/i)
       const unit = m ? ({ 'sq ft': 'ft2', 'm²': 'm2', sqm: 'm2', boxes: 'box' }[m[2]!.toLowerCase()] ?? m[2]!.toLowerCase()) : null
       const missing = ['Confirm product requirements with customer']
       if (!m) missing.push('Quantity and unit required')
       if (/flooring/i.test(raw) && !/vinyl|laminate|porcelain|ceramic/i.test(raw)) missing.push('Material is ambiguous')
       if (/underlay|trims|suitable|matching/i.test(raw)) missing.push('Compatibility requires confirmation')
       if (/approximately/i.test(raw)) missing.push('Approximate quantity requires confirmation')
-      lines.push({ original_text: raw, description: raw, quantity: m?.[1]?.replaceAll(',', '') ?? null, unit, sku: null, brand: null, requirements: {}, missing, delivery: null })
+      const requirements:Record<string,string>={}
+      if(/\bgr[ae]y\b/i.test(raw))requirements.colour='grey'
+      if(/wood[- ]look/i.test(raw))requirements.finish='wood-look'
+      if(/commercial/i.test(raw))requirements.commercial_suitability='true'
+      if(/water resistant/i.test(raw))requirements.water_resistance='true'
+      lines.push({ original_text: raw, description: raw, quantity: m?.[1]?.replaceAll(',', '') ?? null, unit, sku: null, brand: null, requirements, missing, delivery: null })
     }
   }
   if (/next month|next week|second week/i.test(text)) notes.push('Clarify the exact delivery date; relative date preserved above.')

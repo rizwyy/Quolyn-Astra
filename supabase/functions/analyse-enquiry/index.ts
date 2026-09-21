@@ -19,7 +19,8 @@ Deno.serve(async req=>{
  const db=createClient(Deno.env.get('SUPABASE_URL')!,Deno.env.get('SUPABASE_ANON_KEY')!,{global:{headers:{Authorization:header}},auth:{persistSession:false}})
  const {data:user,error:authError}=await db.auth.getUser();if(authError||!user.user)return Response.json({error:'Sign in required'},{status:401,headers:cors})
  const raw=await req.text();if(raw.length>18000)throw new Error('Input too large')
- const {workspace_id,enquiry_id,mode='deterministic',replace_reviewed=false}=JSON.parse(raw)
+ const {workspace_id,enquiry_id,mode='deterministic',replace_reviewed=false,action='analyse'}=JSON.parse(raw)
+ if(action==='status'){const r=await db.from('quolyn_workspace_members').select('role').eq('workspace_id',workspace_id).eq('user_id',user.user.id).maybeSingle();if(r.error||!r.data)throw new Error('Workspace is not accessible');return Response.json({deterministic:true,aiConfigured:!!(Deno.env.get('GEMINI_API_KEY')&&Deno.env.get('GEMINI_MODEL'))},{headers:cors})}
  const {data:enquiry,error}=await db.from('quolyn_enquiries').select('original_text').eq('workspace_id',workspace_id).eq('id',enquiry_id).single();if(error||!enquiry)throw new Error('Enquiry is not accessible')
  const limit=await db.rpc('analysis_limit',{w:workspace_id});if(limit.error)throw new Error(limit.error.message)
  const provider:Provider=mode==='ai'?new GeminiProvider():new DeterministicProvider()

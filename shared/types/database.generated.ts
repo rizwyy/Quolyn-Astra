@@ -460,6 +460,7 @@ export type Database = {
           pack_unit: string | null
           price_minor: number | null
           price_unit: string
+          price_updated_at: string
           selling_unit: string
           sku: string | null
           source: string
@@ -486,6 +487,7 @@ export type Database = {
           pack_unit?: string | null
           price_minor?: number | null
           price_unit?: string
+          price_updated_at?: string
           selling_unit?: string
           sku?: string | null
           source?: string
@@ -512,6 +514,7 @@ export type Database = {
           pack_unit?: string | null
           price_minor?: number | null
           price_unit?: string
+          price_updated_at?: string
           selling_unit?: string
           sku?: string | null
           source?: string
@@ -792,6 +795,41 @@ export type Database = {
           },
         ]
       }
+      quolyn_units: {
+        Row: {
+          base_factor: number
+          code: string
+          dimension: string
+          id: string
+          label: string
+          workspace_id: string
+        }
+        Insert: {
+          base_factor: number
+          code: string
+          dimension: string
+          id?: string
+          label: string
+          workspace_id: string
+        }
+        Update: {
+          base_factor?: number
+          code?: string
+          dimension?: string
+          id?: string
+          label?: string
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quolyn_units_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "quolyn_workspaces"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       quolyn_workspace_members: {
         Row: {
           role: string
@@ -869,7 +907,23 @@ export type Database = {
     }
     Functions: {
       analysis_limit: { Args: { w: string }; Returns: undefined }
+      catalogue_page: {
+        Args: {
+          active_filter?: string
+          brand_filter?: string
+          category_filter?: string
+          page_number?: number
+          q?: string
+          w: string
+        }
+        Returns: Json
+      }
+      combine_lines: {
+        Args: { source_id: string; target_id: string; w: string }
+        Returns: undefined
+      }
       create_workspace: { Args: { p_name: string }; Returns: string }
+      dashboard_metrics: { Args: { w: string }; Returns: Json }
       record_document: {
         Args: { p: string; q: string; v: number; w: string }
         Returns: undefined
@@ -895,6 +949,7 @@ export type Database = {
           pack_unit: string | null
           price_minor: number | null
           price_unit: string
+          price_updated_at: string
           selling_unit: string
           sku: string | null
           source: string
@@ -934,6 +989,7 @@ export type Database = {
           pack_unit: string | null
           price_minor: number | null
           price_unit: string
+          price_updated_at: string
           selling_unit: string
           sku: string | null
           source: string
@@ -1085,4 +1141,3 @@ export const Constants = {
     Enums: {},
   },
 } as const
-

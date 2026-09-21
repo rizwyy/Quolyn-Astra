@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'node:url'
 export default defineNuxtConfig({
   compatibilityDate: '2026-09-20',
   modules: ['@nuxt/ui'],
@@ -6,5 +7,5 @@ export default defineNuxtConfig({
   typescript: { strict: true },
   runtimeConfig: { public: { supabaseUrl: '', supabasePublishableKey: '' } },
   app: { head: { title: 'Quolyn · From enquiry to accurate quote', meta: [{ name: 'description', content: 'A human-reviewed quotation workspace for distributors.' }] } },
-  nitro: { serverAssets: [{ baseName: 'fonts', dir: './public/fonts' }] }
+  nitro: { serverAssets: [{ baseName: 'fonts', dir: fileURLToPath(new URL('./public/fonts', import.meta.url)) }] }
 })

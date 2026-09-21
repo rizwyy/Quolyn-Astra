@@ -29,3 +29,15 @@ describe('import and CSV',()=>{
  it('rejects duplicates in one file',()=>expect(validateImport([{sku:'A'},{sku:'A'}])[1]!.errors).toContain('Duplicate SKU within file'))
  it('escapes spreadsheet formula injection',()=>expect(safeCsv([{name:'=HYPERLINK("evil")'}])).toContain("'=HYPERLINK"))
 })
+
+describe('configured compatible units',()=>{
+ it('converts explicit boxes to per-area prices',()=>expect(priceLine({quantity:'5',unit:'box',priceUnit:'m2',priceMinor:'100',coverage:'2.4',coverageUnit:'m2',taxBps:0})).toMatchObject({packs:'5',delivered:'12',billable:'12',total:'1200'}))
+ it('uses configured factors within a dimension',()=>expect(convert('10','yd2','m2',{yd2:{dimension:'area',factor:'0.83612736'}}).toString()).toBe('8.3612736'))
+ it('rejects configured area-to-length conversions',()=>expect(()=>convert('10','yd2','lm',{yd2:{dimension:'area',factor:'0.83612736'}})).toThrow('Missing conversion'))
+})
+
+it('extracts m², preserves requested attributes and does not reinterpret negative/decimal-comma quantities',()=>{
+ expect(deterministicAnalysis('100 m² grey commercial tile').lines[0]).toMatchObject({quantity:'100',unit:'m2',requirements:{colour:'grey',commercial_suitability:'true'}})
+ expect(deterministicAnalysis('-5 m2 tile').lines[0]!.quantity).toBeNull()
+ expect(deterministicAnalysis('1,5 m2 tile').lines[0]!.quantity).toBeNull()
+})

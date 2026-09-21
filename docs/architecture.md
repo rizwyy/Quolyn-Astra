@@ -4,7 +4,7 @@ Quolyn is a distributor quotation pilot, not an ERP, accounting system, inventor
 
 ## Request and trust boundaries
 
-Nuxt 4 serves Vue pages and three authenticated server operations: spreadsheet preview, fictional demo loading, and document export. `@supabase/ssr` keeps sessions in cookies; protected middleware calls `getUser()`, and every protected server handler independently validates the user. Normal queries and Storage operations carry the user's identity. The application does not need a service-role key.
+Nuxt 4 serves Vue pages and authenticated server operations for spreadsheet preview, fictional demo loading, document export and saved-document downloads. `@supabase/ssr` keeps sessions in cookies; protected middleware calls `getUser()`, and every protected server handler independently validates the user. Normal queries and Storage operations carry the user's identity. The application does not need a service-role key.
 
 Supabase PostgreSQL owns membership, transactional quote saving, exact pricing, optimistic version checks, numbering and status transitions. Supabase Storage keeps original catalogue uploads, assets and exports private. The deployed `analyse-enquiry` Edge Function authenticates with `getUser()` in its body, rate limits, validates extraction and stores analysis transactionally. Gateway `verify_jwt` is disabled because authentication is handled explicitly in the function and modern publishable keys are supported. This is not an anonymous function.
 
@@ -13,7 +13,7 @@ The selected project already had `profiles` and `customers`. To preserve that ap
 ## Data model
 
 - `quolyn_profiles`, `quolyn_workspaces`, `quolyn_workspace_members`: identity and authorization.
-- `quolyn_products`, `quolyn_product_aliases`, `quolyn_catalogue_imports`: catalogue and imports.
+- `quolyn_products`, `quolyn_product_aliases`, `quolyn_units`, `quolyn_catalogue_imports`: catalogue and imports.
 - `quolyn_customers`, `quolyn_enquiries`, `quolyn_enquiry_lines`, `quolyn_match_candidates`: requests and human review.
 - `quolyn_quotes`, `quolyn_quote_lines`, `quolyn_quote_documents`, `quolyn_quote_counters`: commercial records and snapshots.
 - `quolyn_activity_logs`: immutable event records. `quolyn_private.analysis_limits`: controlled counters.
@@ -24,7 +24,7 @@ Composite workspace/id foreign keys reject cross-business relationships. An immu
 
 Quantities and conversions use exact PostgreSQL numeric values. Authoritative monetary calculations occur in `quolyn_private.save_quote`. The Decimal.js module provides a separately testable reference implementation.
 
-1. Convert only the same unit or m²/ft² (`1 ft² = 0.09290304 m²`). Linear metres are never derived from area.
+1. Convert only the same unit, m²/ft² (`1 ft² = 0.09290304 m²`), or workspace-configured units within the same dimension. Owner-defined factors are relative to m², linear metres or each. Linear metres are never derived from area.
 2. When pack coverage is provided, calculate packs using ceiling division and retain delivered coverage separately.
 3. For box prices, bill packs. For area prices, bill explicitly selected requested or delivered coverage.
 4. Round gross minor units half away from zero (all accepted quantities/prices are nonnegative).
