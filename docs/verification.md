@@ -17,6 +17,8 @@ The Nuxt frontend runs locally. It has not been hosted or published. The configu
 | Unit tests | 26 passed, including exact pricing, custom dimensions, pack/area conversion, discount replacement, half-up rounding, CSV formula safety, CSV/XLSX parsing, strict extraction, conflicts/unknown attributes and PDF text checks. Poppler was available; the PDF test ran. |
 | Hosted integration | 51 passed using ordinary authenticated and anonymous HTTP clients against the selected Supabase project. |
 | Local integration | The same 51 checks passed against local Supabase. Local administrator access is confined to fixture preparation. |
+| Hosted browser | 2 passed: the full workflow and anonymous-route/export denial. The local-only Auth test was intentionally skipped in this run. |
+| Local Auth browser | 1 passed: registration, workspace creation, reload, logout, confirmation callback and password recovery. |
 | Dependency audit | `npm audit --omit=dev`: zero reported vulnerabilities at verification time. This is a point-in-time dependency check, not a security guarantee. |
 | Capacity | 10,000 fictional products inserted through ordinary local authenticated clients in 50-row batches; the 10,001st product was rejected and updating an existing item at capacity succeeded. Alias and exact SKU lookup passed. |
 
