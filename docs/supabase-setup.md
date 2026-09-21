@@ -16,6 +16,18 @@ The local `.env` contains only this project's URL and publishable key. It is ign
 
 For a production build, run `npm run build`, then load the environment when starting the server, for example `node --env-file=.env .output/server/index.mjs`. A built Nitro server does not automatically load `.env`.
 
+## Netlify deployment
+
+The repository includes `netlify.toml`: build with `npm run build`, publish `dist`, use Node 24.19 and Nitro's `netlify` preset. Use a server build, not static generation: authenticated spreadsheet preview and PDF export require server functions.
+
+The Netlify build configuration contains the selected project's **public** Supabase URL and `sb_publishable_` key. These are intentionally browser-visible; they do not bypass authentication or RLS. Never put a secret/service-role key in this file or any `NUXT_PUBLIC_*` variable.
+
+Nuxt explicitly captures `NUXT_PUBLIC_SUPABASE_URL` and `NUXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` as build defaults. This is required because Netlify's `[build.environment]` values are available while building, but are not automatically Netlify function runtime variables. The correctly named environment variables can still override configuration at runtime. For a different project, replace both public values and redeploy; keep the pair consistent.
+
+The local ignored `.env` is not uploaded by Git. Changing `.env` locally does not configure the Netlify site. After deploying, `/` should redirect signed-out visitors to `/auth/login`, and a stale `/setup` bookmark should redirect to the working application. An unconfigured deployment shows an owner-facing hosting configuration message.
+
+For `https://quolyn.netlify.app`, set that origin as the intended Auth Site URL and allow `https://quolyn.netlify.app/api/auth/callback` plus its recovery variant before testing real confirmation/recovery emails.
+
 ## Authentication configuration
 
 In Supabase Authentication → URL Configuration, set the intended Site URL and explicitly allow the application callback URL, e.g. `http://localhost:3000/api/auth/callback` (and the equivalent 127.0.0.1 address when used). For recovery, also allow the callback with `?next=recovery`. Add the real HTTPS origin before hosting.

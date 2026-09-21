@@ -1,0 +1,11 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "24.19.0"
+  NITRO_PRESET = "netlify"
+  # Public browser configuration for the user-selected Quolyn project.
+  # This is a publishable key, not a secret/service-role key. RLS protects data.
+  NUXT_PUBLIC_SUPABASE_URL = "https://ahctcbpvbrdeoqrtwvva.supabase.co"
+  NUXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY = "sb_publishable_0neRD8soPoNlx4W-go1d4w_LrOK72il"

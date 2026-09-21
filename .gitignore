@@ -12,3 +12,7 @@ artifacts
 .DS_Store
 
 test-results-*
+
+# Netlify build output and local site connection
+.netlify
+dist

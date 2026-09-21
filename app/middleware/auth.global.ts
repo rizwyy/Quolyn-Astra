@@ -1,7 +1,8 @@
 export default defineNuxtRouteMiddleware(async to => {
-  if (to.path.startsWith('/auth') || to.path==='/setup') return
   const db=useNuxtApp().$supabase
+  if (to.path==='/setup') return db ? navigateTo('/') : undefined
   if (!db) return navigateTo('/setup')
+  if (to.path.startsWith('/auth')) return
   const {data,error}=await db.auth.getUser()
   if(error || !data.user) return navigateTo('/auth/login')
   const w=useWorkspace()
